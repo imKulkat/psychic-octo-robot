@@ -27,27 +27,24 @@ document.addEventListener('keydown', (e) => keys[e.key] = true);
 document.addEventListener('keyup', (e) => keys[e.key] = false);
 
 function update() {
-  // Jump
+  // Apply movement
   if ((keys[' '] || keys['w'] || keys['W']) && player.onGround) {
     player.dy = jumpPower;
-    player.onGround = false;
   }
+
   // Apply gravity
   player.dy += gravity;
   player.y += player.dy;
-  // Collide with ground
-  if (player.y + player.height >= groundY) {
-    player.y = groundY - player.height;
-    player.dy = 0;
-    player.onGround = true;
-  }
-  // Collide with platforms
+
+  // Reset onGround -- Will check again below
   player.onGround = false;
+
+  // Collide with platforms
   platforms.forEach(p => {
     if (
       player.x + player.width > p.x &&
       player.x < p.x + p.width &&
-      player.y + player.height <= p.y + player.dy &&
+      player.y + player.height <= p.y &&
       player.y + player.height + player.dy >= p.y
     ) {
       player.y = p.y - player.height;
@@ -55,6 +52,14 @@ function update() {
       player.onGround = true;
     }
   });
+
+  // Collide with ground
+  if (player.y + player.height >= groundY) {
+    player.y = groundY - player.height;
+    player.dy = 0;
+    player.onGround = true;
+  }
+
   // Move
   if (keys['a'] || keys['A']) player.x -= 4;
   if (keys['d'] || keys['D']) player.x += 4;
