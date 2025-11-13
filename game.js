@@ -28,8 +28,11 @@ function update() {
     player.onGround = true;
   }
   // Move left/right
-  if (keys['ArrowLeft']) player.x -= 4;
-  if (keys['ArrowRight']) player.x += 4;
+if (keys['a'] || keys['A']) player.x -= 4; // Left
+if (keys['d'] || keys['D']) player.x += 4; // Right
+if ((keys['w'] || keys['W']) && player.onGround) { // Jump
+  player.dy = jumpPower;
+  player.onGround = false;
 }
 
 function draw() {
