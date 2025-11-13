@@ -14,7 +14,7 @@ document.addEventListener('keyup', (e) => keys[e.key] = false);
 
 function update() {
   // Jump with W
-  if ((keys['w'] || keys['W']) && player.onGround) {
+  if ((keys[' '] || keys['w']) && player.onGround) {
     player.dy = jumpPower;
     player.onGround = false;
   }
