@@ -37,12 +37,14 @@ let targetCam = player.x - canvas.width / 2 + player.width / 2; // Center player
 cameraX += (targetCam - cameraX) * 0.1; // Smoothly move camera 10% towards target
 
 function update() {
+  ifunction update() {
   if (keys['a'] || keys['A']) player.x -= 4;
   if (keys['d'] || keys['D']) player.x += 4;
 
   if ((keys[' '] || keys['w'] || keys['W']) && player.onGround) {
     player.dy = jumpPower;
   }
+
   player.dy += gravity;
   let nextY = player.y + player.dy;
   player.onGround = false;
@@ -65,10 +67,14 @@ function update() {
     player.dy = 0;
     player.onGround = true;
   }
+
   if (!player.onGround) {
     player.y += player.dy;
   }
-  cameraX = player.x - 100;
+
+  // --- SMOOTH CAMERA ---
+  let targetCam = player.x - canvas.width / 2 + player.width / 2;
+  cameraX += (targetCam - cameraX) * 0.1;
 }
 
 function draw() {
