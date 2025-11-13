@@ -18,30 +18,32 @@ function update() {
     player.dy = jumpPower;
     player.onGround = false;
   }
-  // (Remove the spacebar jump block if only using WASD)
 
   // Apply gravity
   player.dy += gravity;
   player.y += player.dy;
+
   // Collide with ground
   if (player.y + player.height >= groundY) {
     player.y = groundY - player.height;
     player.dy = 0;
     player.onGround = true;
   }
-  // Move left/right
-  if (keys['a'] || keys['A']) player.x -= 4; // Left
-  if (keys['d'] || keys['D']) player.x += 4; // Right
+
+  // Move left/right with A and D
+  if (keys['a'] || keys['A']) player.x -= 4;
+  if (keys['d'] || keys['D']) player.x += 4;
 }
-  }
 
 function draw() {
- ctx.clearRect(0, 0, canvas.width, canvas.height);
-ctx.fillStyle = '#444';
-ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); // Draw ground
-ctx.fillStyle = '#09f';
-ctx.fillRect(player.x, player.y, player.width, player.height);  // Draw player
-
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Draw ground
+  ctx.fillStyle = '#444';
+  ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+  // Draw player
+  ctx.fillStyle = '#09f';
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+}
 
 function loop() {
   update();
