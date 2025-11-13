@@ -33,7 +33,8 @@ let keys = {};
 document.addEventListener('keydown', (e) => keys[e.key] = true);
 document.addEventListener('keyup', (e) => keys[e.key] = false);
 
-let cameraX = 0;
+let targetCam = player.x - canvas.width / 2 + player.width / 2; // Center player
+cameraX += (targetCam - cameraX) * 0.1; // Smoothly move camera 10% towards target
 
 function update() {
   if (keys['a'] || keys['A']) player.x -= 4;
