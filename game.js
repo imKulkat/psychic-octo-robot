@@ -26,6 +26,10 @@ document.addEventListener('keyup', (e) => keys[e.key] = false);
 let cameraX = 0;
 
 function update() {
+  // Horizontal movement
+  if (keys['a'] || keys['A']) player.x -= 4;
+  if (keys['d'] || keys['D']) player.x += 4;
+
   // Jump
   if ((keys[' '] || keys['w'] || keys['W']) && player.onGround) {
     player.dy = jumpPower;
@@ -33,18 +37,21 @@ function update() {
 
   // Gravity
   player.dy += gravity;
-  player.y += player.dy;
 
-  // Assume air
+  // Predict where the player would be after moving vertically
+  let nextY = player.y + player.dy;
+
+  // Assume player is in air
   player.onGround = false;
 
-  // Platform collision (from above)
+  // Platform collision
   platforms.forEach(p => {
+    // Will the bottom of the player cross the top of the platform next frame, and are they horizontally overlapping?
     if (
       player.x + player.width > p.x &&
       player.x < p.x + p.width &&
       player.y + player.height <= p.y &&
-      player.y + player.height + player.dy >= p.y
+      nextY + player.height >= p.y // This checks for crossing the platform
     ) {
       player.y = p.y - player.height;
       player.dy = 0;
@@ -52,21 +59,18 @@ function update() {
     }
   });
 
-  // Ground collision
-  if (player.y + player.height >= groundY) {
+  // Ground collision (run after platforms)
+  if (player.y + player.height + player.dy >= groundY) {
     player.y = groundY - player.height;
     player.dy = 0;
     player.onGround = true;
   }
 
-  // Horizontal movement
-  if (keys['a'] || keys['A']) player.x -= 4;
-  if (keys['d'] || keys['D']) player.x += 4;
-
-  // Camera follows player
-  cameraX = player.x - 100;
+  // If not blocked, update position
+  if (!player.onGround) {
+    player.y += player.dy;
+  }
 }
-
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
