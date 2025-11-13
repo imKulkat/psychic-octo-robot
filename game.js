@@ -1,13 +1,11 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Player settings
-let player = { x: 50, y: 300, width: 40, height: 40, dy: 0, onGround: false };
+let player = { x: 100, y: 300, width: 40, height: 40, dy: 0, onGround: false };
 const gravity = 0.7;
 const jumpPower = -12;
 const groundY = 350;
 
-// Platforms
 let platforms = [];
 function generatePlatforms(num) {
   platforms = [];
@@ -17,29 +15,30 @@ function generatePlatforms(num) {
     let height = 15;
     let y = 320 - Math.random() * 200;
     platforms.push({ x: x, y: y, width: width, height: height });
-    x += 120 + Math.random() * 150;
+    x += 180 + Math.random() * 180;
   }
 }
 
-// Keyboard controls
 let keys = {};
 document.addEventListener('keydown', (e) => keys[e.key] = true);
 document.addEventListener('keyup', (e) => keys[e.key] = false);
 
+let cameraX = 0;
+
 function update() {
-  // Apply movement
+  // Jump
   if ((keys[' '] || keys['w'] || keys['W']) && player.onGround) {
     player.dy = jumpPower;
   }
 
-  // Apply gravity
+  // Gravity
   player.dy += gravity;
   player.y += player.dy;
 
-  // Reset onGround -- Will check again below
+  // Assume air
   player.onGround = false;
 
-  // Collide with platforms
+  // Platform collision (from above)
   platforms.forEach(p => {
     if (
       player.x + player.width > p.x &&
@@ -53,38 +52,47 @@ function update() {
     }
   });
 
-  // Collide with ground
+  // Ground collision
   if (player.y + player.height >= groundY) {
     player.y = groundY - player.height;
     player.dy = 0;
     player.onGround = true;
   }
 
-  // Move
+  // Horizontal movement
   if (keys['a'] || keys['A']) player.x -= 4;
   if (keys['d'] || keys['D']) player.x += 4;
+
+  // Camera follows player
+  cameraX = player.x - 100;
 }
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(-cameraX, 0);
+
   // Draw ground
   ctx.fillStyle = '#444';
-  ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+  ctx.fillRect(cameraX, groundY, canvas.width * 5, canvas.height - groundY);
+
   // Draw platforms
   ctx.fillStyle = '#7a7';
   platforms.forEach(p => {
     ctx.fillRect(p.x, p.y, p.width, p.height);
   });
+
   // Draw player
   ctx.fillStyle = '#09f';
   ctx.fillRect(player.x, player.y, player.width, player.height);
+
+  ctx.restore();
 }
 
+generatePlatforms(25);
 function loop() {
   update();
   draw();
   requestAnimationFrame(loop);
 }
-
-generatePlatforms(5);
 loop();
