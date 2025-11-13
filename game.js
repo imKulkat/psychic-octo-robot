@@ -13,11 +13,13 @@ document.addEventListener('keydown', (e) => keys[e.key] = true);
 document.addEventListener('keyup', (e) => keys[e.key] = false);
 
 function update() {
-  // Jump
-  if (keys[' '] && player.onGround) {
+  // Jump with W
+  if ((keys['w'] || keys['W']) && player.onGround) {
     player.dy = jumpPower;
     player.onGround = false;
   }
+  // (Remove the spacebar jump block if only using WASD)
+
   // Apply gravity
   player.dy += gravity;
   player.y += player.dy;
@@ -28,12 +30,10 @@ function update() {
     player.onGround = true;
   }
   // Move left/right
-if (keys['a'] || keys['A']) player.x -= 4; // Left
-if (keys['d'] || keys['D']) player.x += 4; // Right
-if ((keys['w'] || keys['W']) && player.onGround) { // Jump
-  player.dy = jumpPower;
-  player.onGround = false;
+  if (keys['a'] || keys['A']) player.x -= 4; // Left
+  if (keys['d'] || keys['D']) player.x += 4; // Right
 }
+  }
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
