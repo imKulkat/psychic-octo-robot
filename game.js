@@ -36,14 +36,12 @@ function update() {
   }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // Draw ground
-  ctx.fillStyle = '#444';
-  ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
-  // Draw player
-  ctx.fillStyle = '#09f';
-  ctx.fillRect(player.x, player.y, player.width, player.height);
-}
+ ctx.clearRect(0, 0, canvas.width, canvas.height);
+ctx.fillStyle = '#444';
+ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY); // Draw ground
+ctx.fillStyle = '#09f';
+ctx.fillRect(player.x, player.y, player.width, player.height);  // Draw player
+
 
 function loop() {
   update();
