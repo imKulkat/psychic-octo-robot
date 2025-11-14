@@ -51,7 +51,7 @@ canvas.addEventListener('click', function(event) {
   const speed = 14;
   projectiles.push({
     x: player.x + player.width,
-    y: player.y - player.height/2,
+    y: player.y - 25,
     dx: speed,
     dy: 0,
     exploding: false,
