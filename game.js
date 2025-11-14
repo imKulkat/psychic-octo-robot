@@ -41,7 +41,7 @@ function generatePlatforms(num) {
   let x = 0;
   for (let i = 0; i < num; i++) {
     let width = 100 + Math.random() * 100;
-    let height = 15;
+    let height = 45;
     let y = 320 - Math.random() * 200;
     let imgIndex = Math.floor(Math.random() * platformImgs.length);
     platforms.push({ x, y, width, height, imgIndex });
