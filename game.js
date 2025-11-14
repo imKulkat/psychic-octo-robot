@@ -14,13 +14,10 @@ const platformImgs = [
   new Image(),
   new Image(),
   new Image()
-  ];
-
-platformImgs[0].src = 'sprites/platforms/Plat1.gif'
-
-platformImgs[1].src = 'sprites/platforms/Plat2.gif'
-
-platformImgs[2].src = 'sprites/platforms/Plat3.gif'
+];
+platformImgs[0].src = 'sprites/platforms/Plat1.gif';
+platformImgs[1].src = 'sprites/platforms/Plat2.gif';
+platformImgs[2].src = 'sprites/platforms/Plat3.gif';
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -41,16 +38,14 @@ function generatePlatforms(num) {
   let x = 0;
   for (let i = 0; i < num; i++) {
     let imgIndex = Math.floor(Math.random() * platformImgs.length);
-    let img = platformImgs[imgIndex];
-    let width = img.naturalWidth || 100;    // fallback if not loaded
-    let height = img.naturalHeight || 40;   // fallback if not loaded
     let y = 320 - Math.random() * 200;
+    // Default sizes in case image not loaded yet
+    let width = platformImgs[imgIndex].naturalWidth || 100;
+    let height = platformImgs[imgIndex].naturalHeight || 40;
     platforms.push({ x, y, width, height, imgIndex });
-    x += width + 40 + Math.random() * 40; // space out by width
+    x += width + 40 + Math.random() * 40;
   }
 }
-
-
 generatePlatforms(25);
 
 let keys = {};
@@ -59,19 +54,19 @@ document.addEventListener('keyup', e => keys[e.key] = false);
 
 let cameraX = 0;
 let isMoving = false;
-let lastShotTime = 0
-// SHOOT: Fires in current facing direction
+let lastShotTime = 0;
+
 canvas.addEventListener('click', function(event) {
   const now = Date.now();
-  if (now - lastShotTime < 1000) return; 
-  lastShotTime = now
-  
+  if (now - lastShotTime < 1000) return;
+  lastShotTime = now;
+
   const speed = 14;
   const dir = player.facingRight ? 1 : -1;
   projectiles.push({
     x: player.facingRight
-      ? player.x + player.width * 0.8  // right hand/side
-      : player.x + player.width * 0.2, // left hand/side
+      ? player.x + player.width * 0.8
+      : player.x + player.width * 0.2,
     y: player.y + player.height * 0.6,
     dx: speed * dir,
     dy: 0,
@@ -82,7 +77,6 @@ canvas.addEventListener('click', function(event) {
 
 function update() {
   let moving = false;
-  // Player Movement
   if (keys['a'] || keys['A']) {
     player.x -= keys['A'] ? 8 : 4;
     moving = true;
@@ -95,33 +89,27 @@ function update() {
   }
   isMoving = moving;
 
-  // Jumping
   if ((keys[' '] || keys['w'] || keys['W']) && player.onGround) {
     player.dy = jumpPower;
   }
 
-  // Gravity
   player.dy += gravity;
   let nextY = player.y + player.dy;
   player.onGround = false;
 
-  // Platform Collision
-platforms.forEach(p => {
-  const img = platformImgs[p.imgIndex];
-  let pWidth = img.naturalWidth || 100;
-  let pHeight = img.naturalHeight || 40;
-  if (
-    player.x + player.width > p.x &&
-    player.x < p.x + pWidth &&
-    player.y + player.height <= p.y &&
-    nextY + player.height >= p.y
-  ) {
-    player.y = p.y - player.height;
-    player.dy = 0;
-    player.onGround = true;
-  }
-});
-
+  // Platform Collision (always use platform's width/height)
+  platforms.forEach(p => {
+    if (
+      player.x + player.width > p.x &&
+      player.x < p.x + p.width &&
+      player.y + player.height <= p.y &&
+      nextY + player.height >= p.y
+    ) {
+      player.y = p.y - player.height;
+      player.dy = 0;
+      player.onGround = true;
+    }
+  });
 
   // Ground Collision
   if (player.y + player.height + player.dy >= groundY) {
@@ -130,7 +118,6 @@ platforms.forEach(p => {
     player.onGround = true;
   }
 
-  // Update Y if in air
   if (!player.onGround) {
     player.y += player.dy;
   }
@@ -141,7 +128,7 @@ platforms.forEach(p => {
     if (!p.exploding) {
       p.x += p.dx;
       p.y += p.dy;
-      // Impact with platforms
+      // Projectile-Platform Collision
       for (const plat of platforms) {
         if (
           p.x > plat.x && p.x < plat.x + plat.width &&
@@ -152,12 +139,10 @@ platforms.forEach(p => {
           break;
         }
       }
-      // Impact with ground
       if (p.y > groundY) {
         p.exploding = true;
         p.explosionTimer = 0;
       }
-      // Impact with edge of screen (optional)
       if (
         p.x < cameraX - 100 ||
         p.x > cameraX + canvas.width + 100 ||
@@ -168,16 +153,14 @@ platforms.forEach(p => {
         continue;
       }
     } else {
-      // Exploding: animate for some frames then remove
       p.explosionTimer += 1;
-      if (p.explosionTimer > 24) { // About 0.4 sec at 60 FPS
+      if (p.explosionTimer > 24) {
         projectiles.splice(i, 1);
         continue;
       }
     }
   }
 
-  // Smooth camera
   let targetCam = player.x - canvas.width / 2 + player.width / 2;
   cameraX += (targetCam - cameraX) * 0.1;
 }
@@ -191,16 +174,15 @@ function draw() {
   ctx.fillStyle = '#444';
   ctx.fillRect(cameraX, groundY, canvas.width * 5, canvas.height - groundY);
   // Draw platforms
-platforms.forEach(p => {
-  const img = platformImgs[p.imgIndex];
-  if (img.complete && img.naturalWidth !== 0) {
-    ctx.drawImage(img, p.x, p.y, img.naturalWidth, img.naturalHeight);
-  } else {
-    ctx.fillStyle = '#7a7';
-    ctx.fillRect(p.x, p.y, 100, 40); // fallback if not loaded
-  }
-});
-2. Pla
+  platforms.forEach(p => {
+    const img = platformImgs[p.imgIndex];
+    if (img.complete && img.naturalWidth !== 0) {
+      ctx.drawImage(img, p.x, p.y, p.width, p.height);
+    } else {
+      ctx.fillStyle = '#7a7';
+      ctx.fillRect(p.x, p.y, p.width, p.height);
+    }
+  });
   // Draw projectiles
   projectiles.forEach(p => {
     if (p.exploding) {
