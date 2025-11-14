@@ -1,13 +1,15 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Load player sprites
+// Load images
 const playerIdle = new Image();
 playerIdle.src = 'sprites/PlayerIdle.gif';
 const playerMove = new Image();
 playerMove.src = 'sprites/PlayerMovement.gif';
 const projectileImg = new Image();
 projectileImg.src = 'sprites/gameProjectile.gif';
+const explosionImg = new Image();
+explosionImg.src = 'sprites/gameExplosion.gif'; // <-- Add your explosion GIF
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -43,20 +45,17 @@ document.addEventListener('keyup', e => keys[e.key] = false);
 let cameraX = 0;
 let isMoving = false;
 
-// Launch projectile on click
+// SHOOT: Only shoot forwards (right if facing right)
 canvas.addEventListener('click', function(event) {
-  const rect = canvas.getBoundingClientRect();
-  const mouseX = event.clientX - rect.left + cameraX;
-  const mouseY = event.clientY - rect.top;
-  const dx = mouseX - (player.x + player.width / 2);
-  const dy = mouseY - (player.y + player.height / 2);
-  const length = Math.hypot(dx, dy) || 1;
-  const speed = 10;
+  // Assume right = forwards for now
+  const speed = 14;
   projectiles.push({
-    x: player.x + player.width / 2,
-    y: player.y + player.height / 2,
-    dx: dx / length * speed,
-    dy: dy / length * speed
+    x: player.x + player.width,
+    y: player.y + player.height/2,
+    dx: speed,
+    dy: 0,
+    exploding: false,
+    explosionTimer: 0
   });
 });
 
@@ -103,18 +102,40 @@ function update() {
     player.y += player.dy;
   }
 
-  // Update projectiles
+  // --- Update projectiles ---
   for (let i = projectiles.length - 1; i >= 0; i--) {
-    projectiles[i].x += projectiles[i].dx;
-    projectiles[i].y += projectiles[i].dy;
-    // Remove if offscreen
-    if (
-      projectiles[i].x < cameraX - 100 ||
-      projectiles[i].x > cameraX + canvas.width + 100 ||
-      projectiles[i].y < -100 ||
-      projectiles[i].y > canvas.height + 100
-    ) {
-      projectiles.splice(i, 1);
+    const p = projectiles[i];
+    if (!p.exploding) {
+      p.x += p.dx;
+      p.y += p.dy;
+      // Impact with platforms
+      for (const plat of platforms) {
+        if (
+          p.x > plat.x && p.x < plat.x + plat.width &&
+          p.y > plat.y && p.y < plat.y + plat.height
+        ) {
+          p.exploding = true;
+          p.explosionTimer = 0;
+          break;
+        }
+      }
+      // Impact with ground
+      if (p.y > groundY) {
+        p.exploding = true;
+        p.explosionTimer = 0;
+      }
+      // Impact with edge of screen (optional)
+      if (p.x < cameraX - 100 || p.x > cameraX + canvas.width + 100 || p.y < -100 || p.y > canvas.height + 100) {
+        projectiles.splice(i, 1);
+        continue;
+      }
+    } else {
+      // Exploding: animate for some frames then remove
+      p.explosionTimer += 1;
+      if (p.explosionTimer > 24) { // About 0.4 sec at 60 FPS
+        projectiles.splice(i, 1);
+        continue;
+      }
     }
   }
 
@@ -131,25 +152,33 @@ function draw() {
   // Draw ground
   ctx.fillStyle = '#444';
   ctx.fillRect(cameraX, groundY, canvas.width * 5, canvas.height - groundY);
-
   // Draw platforms
   ctx.fillStyle = '#7a7';
   platforms.forEach(p => {
     ctx.fillRect(p.x, p.y, p.width, p.height);
   });
-
   // Draw projectiles
   projectiles.forEach(p => {
-    if (projectileImg.complete && projectileImg.naturalWidth !== 0) {
-      ctx.drawImage(projectileImg, p.x - 16, p.y - 16, 32, 32); // adjust size as needed
+    if (p.exploding) {
+      if (explosionImg.complete && explosionImg.naturalWidth !== 0) {
+        ctx.drawImage(explosionImg, p.x - 32, p.y - 32, 64, 64);
+      } else {
+        ctx.fillStyle = 'orange';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 32, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else {
-      ctx.fillStyle = '#ff0';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
-      ctx.fill();
+      if (projectileImg.complete && projectileImg.naturalWidth !== 0) {
+        ctx.drawImage(projectileImg, p.x - 16, p.y - 16, 32, 32);
+      } else {
+        ctx.fillStyle = '#ff0';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   });
-
   // Draw player (GIF sprite)
   let sprite = isMoving ? playerMove : playerIdle;
   if (sprite.complete && sprite.naturalWidth !== 0) {
@@ -158,7 +187,6 @@ function draw() {
     ctx.fillStyle = '#09f';
     ctx.fillRect(player.x, player.y, player.width, player.height);
   }
-
   ctx.restore();
 }
 
