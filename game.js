@@ -3,7 +3,7 @@ const ctx = canvas.getContext('2d');
 
 // Load player GIF sprite
 const playerImg = new Image();
-playerImg.src = 'sprites/player.gif'; // Ensure this path and file exist
+playerImg.src = 'sprites/player'; // Ensure this path and file exist
 
 // Resize canvas to always fit the window
 function resizeCanvas() {
