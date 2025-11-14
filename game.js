@@ -18,10 +18,11 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-let player = { x: 100, y: 300, width: 100, height: 100, dy: 0, onGround: false };
+let player = { x: 100, y: 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true};
 const gravity = 0.7;
 const jumpPower = -12;
-const groundY = 350;
+const groundY = 350;]
+let player = { x: 100, y: 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true };
 
 let projectiles = [];
 let platforms = [];
@@ -47,12 +48,14 @@ let isMoving = false;
 
 // SHOOT: Only shoot forwards (right if facing right)
 canvas.addEventListener('click', function(event) {
-  // Assume right = forwards for now
   const speed = 14;
+  const dir = player.facingRight ? 1 : -1;
   projectiles.push({
-    x: player.x + player.width * 0.6,
+    x: player.facingRight
+      ? player.x + player.width * 0.8  // from right side
+      : player.x + player.width * 0.2, // from left side
     y: player.y + player.height * 0.6,
-    dx: speed,
+    dx: speed * dir,
     dy: 0,
     exploding: false,
     explosionTimer: 0
@@ -62,8 +65,8 @@ canvas.addEventListener('click', function(event) {
 function update() {
   let moving = false;
   // Player Movement
-  if (keys['a'] || keys['A']) { player.x -= keys['A'] ? 8 : 4; moving = true; }
-  if (keys['d'] || keys['D']) { player.x += keys['D'] ? 8 : 4; moving = true; }
+  if (keys['a'] || keys['A']) { player.x -= keys['A'] ? 8 : 4; moving = true; player.facingRight = false; }
+  if (keys['d'] || keys['D']) { player.x += keys['D'] ? 8 : 4; moving = true; player.facingRight = true;}
   isMoving = moving;
 
   // Jumping
