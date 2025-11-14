@@ -11,9 +11,9 @@ projectileImg.src = 'sprites/gameProjectile.gif';
 const explosionImg = new Image();
 explosionImg.src = 'sprites/gameExplosion.gif';
 const platformImgs = [
-  plat1(),
-  plat2(),
-  plat3()
+  new Image(),
+  new Image(),
+  new Image()
   ];
 
 platformImgs[0].src = 'sprites/platforms/Plat1.gif'
