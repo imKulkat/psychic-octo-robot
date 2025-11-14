@@ -37,8 +37,10 @@ let cameraX = 0;
 
 function update() {
   // --- Player Movement ---
-  if (keys['a'] || keys['A']) player.x -= 8;
-  if (keys['d'] || keys['D']) player.x += 8;
+  if (keys['a']) player.x -= 4;
+  if (keys['d']) player.x += 4;
+  if (keys['A']) player.x -= 8;
+  if (keys['D']) player.x += 8;
 
   // --- Jumping ---
   if ((keys[' '] || keys['w'] || keys['W']) && player.onGround) {
