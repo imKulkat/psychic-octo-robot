@@ -187,7 +187,7 @@ function draw() {
       } else {
         ctx.fillStyle = 'orange';
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 32, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 50, 0, Math.PI * 2);
         ctx.fill();
       }
     } else {
@@ -196,7 +196,7 @@ function draw() {
       } else {
         ctx.fillStyle = '#ff0';
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 30, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 50, 0, Math.PI * 2);
         ctx.fill();
       }
     }
