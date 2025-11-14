@@ -1,6 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-
+const playerImg = new Image();
+playerImg.src = 'sprites/player.gif';
 // Resize canvas to always fit the window
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -101,12 +102,16 @@ function draw() {
   });
 
   // Draw player
+/ Draw player
+if (playerImg.complete && playerImg.naturalWidth !== 0) {
+  ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+} else {
+  // Fallback: draw a blue rectangle while image loads
   ctx.fillStyle = '#09f';
   ctx.fillRect(player.x, player.y, player.width, player.height);
-
-  ctx.restore();
 }
 
+ctx.restore();
 function loop() {
   update();
   draw();
