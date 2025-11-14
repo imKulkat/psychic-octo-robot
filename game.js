@@ -35,7 +35,7 @@ let projectiles = [];
 let platforms = [];
 
 function generatePlatforms(num) {
-  if (!num) num = 120; // Lots for an endless feel
+  if (!num) num = 1200; // Lots for an endless feel
   platforms = [];
   let x = 0;
   for (let i = 0; i < num; i++) {
@@ -192,11 +192,11 @@ function draw() {
       }
     } else {
       if (projectileImg.complete && projectileImg.naturalWidth !== 0) {
-        ctx.drawImage(projectileImg, p.x - 16, p.y - 16, 32, 32);
+        ctx.drawImage(projectileImg, p.x - 32, p.y - 32, 64, 64);
       } else {
         ctx.fillStyle = '#ff0';
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 30, 0, Math.PI * 2);
         ctx.fill();
       }
     }
