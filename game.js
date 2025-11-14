@@ -106,18 +106,15 @@ function update() {
   player.onGround = false;
 
   // Platform Collision
-  platforms.forEach(p => {
-    if (
-      player.x + player.width > p.x &&
-      player.x < p.x + p.width &&
-      player.y + player.height <= p.y &&
-      nextY + player.height >= p.y
-    ) {
-      player.y = p.y - player.height;
-      player.dy = 0;
-      player.onGround = true;
-    }
-  });
+ platforms.forEach(p => {
+  const img = platformImgs[p.imgIndex];
+  if (img.complete && img.naturalWidth !== 0) {
+    ctx.drawImage(img, p.x, p.y, img.naturalWidth, img.naturalHeight);
+  } else {
+    ctx.fillStyle = '#7a7';
+    ctx.fillRect(p.x, p.y, 100, 40); // fallback placeholder
+  }
+});
 
   // Ground Collision
   if (player.y + player.height + player.dy >= groundY) {
