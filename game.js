@@ -40,14 +40,16 @@ function generatePlatforms(num) {
   platforms = [];
   let x = 0;
   for (let i = 0; i < num; i++) {
-    let width = 100 + Math.random() * 100;
-    let height = 45;
-    let y = 320 - Math.random() * 200;
     let imgIndex = Math.floor(Math.random() * platformImgs.length);
+    let img = platformImgs[imgIndex];
+    let width = img.naturalWidth || 100;    // fallback if not loaded
+    let height = img.naturalHeight || 40;   // fallback if not loaded
+    let y = 320 - Math.random() * 200;
     platforms.push({ x, y, width, height, imgIndex });
-    x += 180 + Math.random() * 180;
+    x += width + 40 + Math.random() * 40; // space out by width
   }
 }
+
 
 generatePlatforms(25);
 
