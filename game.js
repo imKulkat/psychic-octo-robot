@@ -1,12 +1,12 @@
-const canvas = document.getElementById('gameCanvas');
+onst canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Load player GIF sprite
-const playerImg = new Image();
-playerImg.src = 'sprites/PlayerIdle.gif'; // Ensure this path and file exist
+// Load player sprites
 const playerIdle = new Image();
-playerIdle.src = 'sprites/PlayerIdle.gif;
-// Resize canvas to always fit the window
+playerIdle.src = 'sprites/PlayerIdle.gif'; // idle sprite
+const playerMove = new Image();
+playerMove.src = 'sprites/PlayerMove.gif'; // movement sprite
+
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -14,13 +14,11 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Player setup
 let player = { x: 100, y: 300, width: 40, height: 40, dy: 0, onGround: false };
 const gravity = 0.7;
 const jumpPower = -12;
 const groundY = 350;
 
-// Platforms
 let platforms = [];
 function generatePlatforms(num) {
   platforms = [];
@@ -35,19 +33,19 @@ function generatePlatforms(num) {
 }
 generatePlatforms(25);
 
-// Input
 let keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
 
 let cameraX = 0;
+let isMoving = false;
 
 function update() {
   // Player Movement
-  if (keys['a']) player.x -= 4;
-  if (keys['d']) player.x += 4;
-  if (keys['A']) player.x -= 8;
-  if (keys['D']) player.x += 8;
+  let moving = false;
+  if (keys['a'] || keys['A']) { player.x -= keys['A'] ? 8 : 4; moving = true; }
+  if (keys['d'] || keys['D']) { player.x += keys['D'] ? 8 : 4; moving = true; }
+  isMoving = moving;
 
   // Jumping
   if ((keys[' '] || keys['w'] || keys['W']) && player.onGround) {
@@ -105,9 +103,11 @@ function draw() {
     ctx.fillRect(p.x, p.y, p.width, p.height);
   });
 
-  // Draw player (GIF sprite)
-  if (playerImg.complete && playerImg.naturalWidth !== 0) {
-    ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+  // Decide which sprite to draw
+  let sprite = isMoving ? playerMove : playerIdle;
+
+  if (sprite.complete && sprite.naturalWidth !== 0) {
+    ctx.drawImage(sprite, player.x, player.y, player.width, player.height);
   } else {
     ctx.fillStyle = '#09f';
     ctx.fillRect(player.x, player.y, player.width, player.height);
@@ -123,8 +123,6 @@ function loop() {
 }
 loop();
 
-// Optional: Press 'f' for fullscreen
-// (Requires user gesture in most browsers)
 document.addEventListener('keydown', function(e) {
   if (e.key === 'f') {
     if (canvas.requestFullscreen) {
