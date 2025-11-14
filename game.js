@@ -9,7 +9,7 @@ playerMove.src = 'sprites/PlayerMovement.gif';
 const projectileImg = new Image();
 projectileImg.src = 'sprites/gameProjectile.gif';
 const explosionImg = new Image();
-explosionImg.src = 'sprites/gameExplosion.gif'; // <-- Add your explosion GIF
+explosionImg.src = 'sprites/gameExplosion.gif';
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -18,11 +18,10 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-let player = { x: 100, y: 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true};
+let player = { x: 100, y: 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true };
 const gravity = 0.7;
 const jumpPower = -12;
-const groundY = 350;]
-let player = { x: 100, y: 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true };
+const groundY = 350;
 
 let projectiles = [];
 let platforms = [];
@@ -46,14 +45,14 @@ document.addEventListener('keyup', e => keys[e.key] = false);
 let cameraX = 0;
 let isMoving = false;
 
-// SHOOT: Only shoot forwards (right if facing right)
+// SHOOT: Fires in current facing direction
 canvas.addEventListener('click', function(event) {
   const speed = 14;
   const dir = player.facingRight ? 1 : -1;
   projectiles.push({
     x: player.facingRight
-      ? player.x + player.width * 0.8  // from right side
-      : player.x + player.width * 0.2, // from left side
+      ? player.x + player.width * 0.8  // right hand/side
+      : player.x + player.width * 0.2, // left hand/side
     y: player.y + player.height * 0.6,
     dx: speed * dir,
     dy: 0,
@@ -65,8 +64,16 @@ canvas.addEventListener('click', function(event) {
 function update() {
   let moving = false;
   // Player Movement
-  if (keys['a'] || keys['A']) { player.x -= keys['A'] ? 8 : 4; moving = true; player.facingRight = false; }
-  if (keys['d'] || keys['D']) { player.x += keys['D'] ? 8 : 4; moving = true; player.facingRight = true;}
+  if (keys['a'] || keys['A']) {
+    player.x -= keys['A'] ? 8 : 4;
+    moving = true;
+    player.facingRight = false;
+  }
+  if (keys['d'] || keys['D']) {
+    player.x += keys['D'] ? 8 : 4;
+    moving = true;
+    player.facingRight = true;
+  }
   isMoving = moving;
 
   // Jumping
@@ -128,7 +135,12 @@ function update() {
         p.explosionTimer = 0;
       }
       // Impact with edge of screen (optional)
-      if (p.x < cameraX - 100 || p.x > cameraX + canvas.width + 100 || p.y < -100 || p.y > canvas.height + 100) {
+      if (
+        p.x < cameraX - 100 ||
+        p.x > cameraX + canvas.width + 100 ||
+        p.y < -100 ||
+        p.y > canvas.height + 100
+      ) {
         projectiles.splice(i, 1);
         continue;
       }
