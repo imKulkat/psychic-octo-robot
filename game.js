@@ -1,32 +1,49 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Player & projectile sprites
+const playerIdle = new Image();
+playerIdle.src = 'sprites/PlayerIdle.gif';
+const playerMove = new Image();
+playerMove.src = 'sprites/PlayerMovement.gif';
+const projectileImg = new Image();
+projectileImg.src = 'sprites/gameProjectile.gif';
+const explosionImg = new Image();
+explosionImg.src = 'sprites/gameExplosion.gif';
+
+// Fixed heights for platforms
+const PLATFORM_HEIGHTS = [canvas.height - 220, canvas.height - 340, canvas.height - 460];
+// (We'll update on resize!)
+
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  // When the screen is resized, adjust platform heights:
+  for (let i = 0; i < PLATFORM_HEIGHTS.length; i++) {
+    PLATFORM_HEIGHTS[i] = canvas.height - (160 + 120 * i);
+  }
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-let player = { x: 100, y: 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true };
-const gravity = 0.7;
-const jumpPower = -12;
-const groundY = 350;
+let player = { x: 100, y: canvas.height - 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true };
+const gravity = 1.1;
+const jumpPower = -20;
+const groundY = canvas.height - 80;
 
 let projectiles = [];
 let platforms = [];
-const PLATFORM_HEIGHTS = [100, 220, 340]; // Adjust these to 3 set heights
 
 function generatePlatforms(num) {
-  if (!num) num = 100; // Generate a lot for an endless feel
+  if (!num) num = 120; // Lots for an endless feel
   platforms = [];
   let x = 0;
   for (let i = 0; i < num; i++) {
-    let width = 100 + Math.random() * 120;
-    let height = 20;
+    let width = 120 + Math.random() * 130;
+    let height = 28;
     let y = PLATFORM_HEIGHTS[Math.floor(Math.random() * PLATFORM_HEIGHTS.length)];
     platforms.push({ x, y, width, height });
-    x += 150 + Math.random() * 220;
+    x += 190 + Math.random() * 200; // More space horizontally
   }
 }
 generatePlatforms();
@@ -39,12 +56,11 @@ let cameraX = 0;
 let isMoving = false;
 let lastShotTime = 0;
 
-// SHOOT: Fires in current facing direction
 canvas.addEventListener('click', function(event) {
   const now = Date.now();
-  if (now - lastShotTime < 1000) return; 
+  if (now - lastShotTime < 500) return;
   lastShotTime = now;
-  const speed = 14;
+  const speed = 20;
   const dir = player.facingRight ? 1 : -1;
   projectiles.push({
     x: player.facingRight
@@ -61,12 +77,12 @@ canvas.addEventListener('click', function(event) {
 function update() {
   let moving = false;
   if (keys['a'] || keys['A']) {
-    player.x -= keys['A'] ? 8 : 4;
+    player.x -= keys['A'] ? 13 : 7;
     moving = true;
     player.facingRight = false;
   }
   if (keys['d'] || keys['D']) {
-    player.x += keys['D'] ? 8 : 4;
+    player.x += keys['D'] ? 13 : 7;
     moving = true;
     player.facingRight = true;
   }
@@ -166,21 +182,34 @@ function draw() {
   // Draw projectiles
   projectiles.forEach(p => {
     if (p.exploding) {
-      ctx.fillStyle = 'orange';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 32, 0, Math.PI * 2);
-      ctx.fill();
+      if (explosionImg.complete && explosionImg.naturalWidth !== 0) {
+        ctx.drawImage(explosionImg, p.x - 32, p.y - 32, 64, 64);
+      } else {
+        ctx.fillStyle = 'orange';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 32, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else {
-      ctx.fillStyle = '#ff0';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
-      ctx.fill();
+      if (projectileImg.complete && projectileImg.naturalWidth !== 0) {
+        ctx.drawImage(projectileImg, p.x - 16, p.y - 16, 32, 32);
+      } else {
+        ctx.fillStyle = '#ff0';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   });
 
-  // Draw player (just blue square for now)
-  ctx.fillStyle = '#09f';
-  ctx.fillRect(player.x, player.y, player.width, player.height);
+  // Draw player sprite (moving or idle)
+  let sprite = isMoving ? playerMove : playerIdle;
+  if (sprite.complete && sprite.naturalWidth !== 0) {
+    ctx.drawImage(sprite, player.x, player.y, player.width, player.height);
+  } else {
+    ctx.fillStyle = '#09f';
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+  }
   ctx.restore();
 }
 
