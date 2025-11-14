@@ -26,7 +26,7 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-let player = { x: 100, y: canvas.height - 300, width: 100, height: 100, dy: 0, onGround: false, facingRight: true };
+let player = { x: 100, y: canvas.height - 300, width: 200, height: 200, dy: 0, onGround: false, facingRight: true };
 const gravity = 1.1;
 const jumpPower = -20;
 const groundY = canvas.height - 80;
