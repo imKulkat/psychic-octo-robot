@@ -106,15 +106,22 @@ function update() {
   player.onGround = false;
 
   // Platform Collision
- platforms.forEach(p => {
+platforms.forEach(p => {
   const img = platformImgs[p.imgIndex];
-  if (img.complete && img.naturalWidth !== 0) {
-    ctx.drawImage(img, p.x, p.y, img.naturalWidth, img.naturalHeight);
-  } else {
-    ctx.fillStyle = '#7a7';
-    ctx.fillRect(p.x, p.y, 100, 40); // fallback placeholder
+  let pWidth = img.naturalWidth || 100;
+  let pHeight = img.naturalHeight || 40;
+  if (
+    player.x + player.width > p.x &&
+    player.x < p.x + pWidth &&
+    player.y + player.height <= p.y &&
+    nextY + player.height >= p.y
+  ) {
+    player.y = p.y - player.height;
+    player.dy = 0;
+    player.onGround = true;
   }
 });
+
 
   // Ground Collision
   if (player.y + player.height + player.dy >= groundY) {
@@ -187,12 +194,13 @@ function draw() {
 platforms.forEach(p => {
   const img = platformImgs[p.imgIndex];
   if (img.complete && img.naturalWidth !== 0) {
-    ctx.drawImage(img, p.x, p.y, p.width, p.height);
+    ctx.drawImage(img, p.x, p.y, img.naturalWidth, img.naturalHeight);
   } else {
     ctx.fillStyle = '#7a7';
-    ctx.fillRect(p.x, p.y, p.width, p.height);
+    ctx.fillRect(p.x, p.y, 100, 40); // fallback if not loaded
   }
 });
+2. Pla
   // Draw projectiles
   projectiles.forEach(p => {
     if (p.exploding) {
