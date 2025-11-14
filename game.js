@@ -44,9 +44,13 @@ document.addEventListener('keyup', e => keys[e.key] = false);
 
 let cameraX = 0;
 let isMoving = false;
-
+let lastShotTime = 0
 // SHOOT: Fires in current facing direction
 canvas.addEventListener('click', function(event) {
+  const now = Date.now();
+  if (now - lastShotTime < 1000) return; 
+  lastShotTime = now
+  
   const speed = 14;
   const dir = player.facingRight ? 1 : -1;
   projectiles.push({
