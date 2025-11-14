@@ -50,7 +50,7 @@ canvas.addEventListener('click', function(event) {
   // Assume right = forwards for now
   const speed = 14;
   projectiles.push({
-    x: player.x + player.width,
+    x: player.x + player.width * 0.6,
     y: player.y + player.height * 0.6,
     dx: speed,
     dy: 0,
