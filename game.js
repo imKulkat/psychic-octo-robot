@@ -5,7 +5,7 @@ const ctx = canvas.getContext('2d');
 const playerIdle = new Image();
 playerIdle.src = 'sprites/PlayerIdle.gif';
 const playerMove = new Image();
-playerMove.src = 'sprites/PlayerMove.gif';
+playerMove.src = 'sprites/PlayerMovement.gif';
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
