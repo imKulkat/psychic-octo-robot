@@ -1,11 +1,11 @@
-onst canvas = document.getElementById('gameCanvas');
+const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // Load player sprites
 const playerIdle = new Image();
-playerIdle.src = 'sprites/PlayerIdle.gif'; // idle sprite
+playerIdle.src = 'sprites/PlayerIdle.gif';
 const playerMove = new Image();
-playerMove.src = 'sprites/PlayerMove.gif'; // movement sprite
+playerMove.src = 'sprites/PlayerMove.gif';
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -41,8 +41,8 @@ let cameraX = 0;
 let isMoving = false;
 
 function update() {
-  // Player Movement
   let moving = false;
+  // Player Movement
   if (keys['a'] || keys['A']) { player.x -= keys['A'] ? 8 : 4; moving = true; }
   if (keys['d'] || keys['D']) { player.x += keys['D'] ? 8 : 4; moving = true; }
   isMoving = moving;
@@ -96,23 +96,19 @@ function draw() {
   // Draw ground
   ctx.fillStyle = '#444';
   ctx.fillRect(cameraX, groundY, canvas.width * 5, canvas.height - groundY);
-
   // Draw platforms
   ctx.fillStyle = '#7a7';
   platforms.forEach(p => {
     ctx.fillRect(p.x, p.y, p.width, p.height);
   });
-
-  // Decide which sprite to draw
+  // Draw player (GIF sprite)
   let sprite = isMoving ? playerMove : playerIdle;
-
   if (sprite.complete && sprite.naturalWidth !== 0) {
     ctx.drawImage(sprite, player.x, player.y, player.width, player.height);
   } else {
     ctx.fillStyle = '#09f';
     ctx.fillRect(player.x, player.y, player.width, player.height);
   }
-
   ctx.restore();
 }
 
