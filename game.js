@@ -1,24 +1,6 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Load images
-const playerIdle = new Image();
-playerIdle.src = 'sprites/PlayerIdle.gif';
-const playerMove = new Image();
-playerMove.src = 'sprites/PlayerMovement.gif';
-const projectileImg = new Image();
-projectileImg.src = 'sprites/gameProjectile.gif';
-const explosionImg = new Image();
-explosionImg.src = 'sprites/gameExplosion.gif';
-const platformImgs = [
-  new Image(),
-  new Image(),
-  new Image()
-];
-platformImgs[0].src = 'sprites/platforms/Plat1.gif';
-platformImgs[1].src = 'sprites/platforms/Plat2.gif';
-platformImgs[2].src = 'sprites/platforms/Plat3.gif';
-
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -33,20 +15,21 @@ const groundY = 350;
 
 let projectiles = [];
 let platforms = [];
+const PLATFORM_HEIGHTS = [100, 220, 340]; // Adjust these to 3 set heights
+
 function generatePlatforms(num) {
+  if (!num) num = 100; // Generate a lot for an endless feel
   platforms = [];
   let x = 0;
   for (let i = 0; i < num; i++) {
-    let imgIndex = Math.floor(Math.random() * platformImgs.length);
-    let y = 320 - Math.random() * 200;
-    // Default sizes in case image not loaded yet
-    let width = platformImgs[imgIndex].naturalWidth || 100;
-    let height = platformImgs[imgIndex].naturalHeight || 40;
-    platforms.push({ x, y, width, height, imgIndex });
-    x += width + 40 + Math.random() * 40;
+    let width = 100 + Math.random() * 120;
+    let height = 20;
+    let y = PLATFORM_HEIGHTS[Math.floor(Math.random() * PLATFORM_HEIGHTS.length)];
+    platforms.push({ x, y, width, height });
+    x += 150 + Math.random() * 220;
   }
 }
-generatePlatforms(25);
+generatePlatforms();
 
 let keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
@@ -56,11 +39,11 @@ let cameraX = 0;
 let isMoving = false;
 let lastShotTime = 0;
 
+// SHOOT: Fires in current facing direction
 canvas.addEventListener('click', function(event) {
   const now = Date.now();
-  if (now - lastShotTime < 1000) return;
+  if (now - lastShotTime < 1000) return; 
   lastShotTime = now;
-
   const speed = 14;
   const dir = player.facingRight ? 1 : -1;
   projectiles.push({
@@ -97,7 +80,7 @@ function update() {
   let nextY = player.y + player.dy;
   player.onGround = false;
 
-  // Platform Collision (always use platform's width/height)
+  // Platform collision
   platforms.forEach(p => {
     if (
       player.x + player.width > p.x &&
@@ -111,7 +94,7 @@ function update() {
     }
   });
 
-  // Ground Collision
+  // Ground collision
   if (player.y + player.height + player.dy >= groundY) {
     player.y = groundY - player.height;
     player.dy = 0;
@@ -173,46 +156,31 @@ function draw() {
   // Draw ground
   ctx.fillStyle = '#444';
   ctx.fillRect(cameraX, groundY, canvas.width * 5, canvas.height - groundY);
-  // Draw platforms
+
+  // Draw platforms (gray)
   platforms.forEach(p => {
-    const img = platformImgs[p.imgIndex];
-    if (img.complete && img.naturalWidth !== 0) {
-      ctx.drawImage(img, p.x, p.y, p.width, p.height);
-    } else {
-      ctx.fillStyle = '#7a7';
-      ctx.fillRect(p.x, p.y, p.width, p.height);
-    }
+    ctx.fillStyle = '#888';
+    ctx.fillRect(p.x, p.y, p.width, p.height);
   });
+
   // Draw projectiles
   projectiles.forEach(p => {
     if (p.exploding) {
-      if (explosionImg.complete && explosionImg.naturalWidth !== 0) {
-        ctx.drawImage(explosionImg, p.x - 32, p.y - 32, 64, 64);
-      } else {
-        ctx.fillStyle = 'orange';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 32, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.fillStyle = 'orange';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 32, 0, Math.PI * 2);
+      ctx.fill();
     } else {
-      if (projectileImg.complete && projectileImg.naturalWidth !== 0) {
-        ctx.drawImage(projectileImg, p.x - 16, p.y - 16, 32, 32);
-      } else {
-        ctx.fillStyle = '#ff0';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.fillStyle = '#ff0';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+      ctx.fill();
     }
   });
-  // Draw player (GIF sprite)
-  let sprite = isMoving ? playerMove : playerIdle;
-  if (sprite.complete && sprite.naturalWidth !== 0) {
-    ctx.drawImage(sprite, player.x, player.y, player.width, player.height);
-  } else {
-    ctx.fillStyle = '#09f';
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-  }
+
+  // Draw player (just blue square for now)
+  ctx.fillStyle = '#09f';
+  ctx.fillRect(player.x, player.y, player.width, player.height);
   ctx.restore();
 }
 
