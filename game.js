@@ -10,6 +10,17 @@ const projectileImg = new Image();
 projectileImg.src = 'sprites/gameProjectile.gif';
 const explosionImg = new Image();
 explosionImg.src = 'sprites/gameExplosion.gif';
+const platformImgs = [
+  plat1(),
+  plat2(),
+  plat3()
+  ];
+
+platformImgs[0].src = 'sprites/platforms/Plat1.gif'
+
+platformImgs[1].src = 'sprites/platforms/Plat2.gif'
+
+platformImgs[2].src = 'sprites/platforms/Plat3.gif'
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -32,10 +43,12 @@ function generatePlatforms(num) {
     let width = 100 + Math.random() * 100;
     let height = 15;
     let y = 320 - Math.random() * 200;
-    platforms.push({ x, y, width, height });
+    let imgIndex = Math.floor(Math.random() * platformImgs.length);
+    platforms.push({ x, y, width, height, imgIndex });
     x += 180 + Math.random() * 180;
   }
 }
+
 generatePlatforms(25);
 
 let keys = {};
@@ -172,10 +185,15 @@ function draw() {
   ctx.fillStyle = '#444';
   ctx.fillRect(cameraX, groundY, canvas.width * 5, canvas.height - groundY);
   // Draw platforms
-  ctx.fillStyle = '#7a7';
-  platforms.forEach(p => {
+platforms.forEach(p => {
+  const img = platformImgs[p.imgIndex];
+  if (img.complete && img.naturalWidth !== 0) {
+    ctx.drawImage(img, p.x, p.y, p.width, p.height);
+  } else {
+    ctx.fillStyle = '#7a7';
     ctx.fillRect(p.x, p.y, p.width, p.height);
-  });
+  }
+});
   // Draw projectiles
   projectiles.forEach(p => {
     if (p.exploding) {
